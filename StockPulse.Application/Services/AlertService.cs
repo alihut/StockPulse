@@ -7,15 +7,20 @@ public class AlertService : IAlertService
 {
     private readonly IAlertRepository _alertRepository;
     private readonly IMapper _mapper;
+    private readonly ISymbolValidator _symbolValidator;
 
-    public AlertService(IAlertRepository alertRepository, IMapper mapper)
+    public AlertService(IAlertRepository alertRepository, IMapper mapper, ISymbolValidator symbolValidator)
     {
         _alertRepository = alertRepository;
         _mapper = mapper;
+        _symbolValidator = symbolValidator;
     }
 
     public async Task RegisterAlertAsync(CreateAlertRequestDto request)
     {
+        if (!_symbolValidator.IsValid(request.Symbol))
+            throw new ArgumentException("Invalid stock symbol.");
+
         var alert = _mapper.Map<Alert>(request);
         alert.Id = Guid.NewGuid();
         //alert.CreatedAt = DateTime.UtcNow;

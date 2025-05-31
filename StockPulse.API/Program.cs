@@ -7,10 +7,13 @@ using StockPulse.API.Services;
 using StockPulse.Application.Interfaces;
 using StockPulse.Application.Services;
 using StockPulse.Application.Settings;
+using StockPulse.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(nameof(JwtSettings)));
+builder.Services.Configure<StockSettings>(builder.Configuration.GetSection("StockSettings"));
+
 
 var jwtSettings = builder.Configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>();
 var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
@@ -42,6 +45,8 @@ builder.Services.AddAuthorization();
 
 //builder.Services.AddSingleton<IStockPriceProvider, StockPriceSimulator>();
 builder.Services.AddHostedService<StockPriceSimulator>();
+
+builder.Services.AddScoped<ISymbolValidator, SymbolValidator>();
 
 builder.Services.AddScoped<IAlertService, AlertService>();
 builder.Services.AddScoped<IStockPriceService, StockPriceService>();
