@@ -8,10 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\StockPulse.Application\StockPulse.Application.csproj" />
     <ProjectReference Include="..\StockPulse.Infrastructure\StockPulse.Infrastructure.csproj" />
   </ItemGroup>
 

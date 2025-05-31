@@ -1,15 +1,21 @@
+using StockPulse.API.Hubs;
 using StockPulse.API.Mappings;
+using StockPulse.API.Services;
 using StockPulse.Application.Interfaces;
-using StockPulse.Infrastructure.Services;
+using StockPulse.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddSingleton<IStockPriceProvider, StockPriceSimulator>();
+//builder.Services.AddSingleton<IStockPriceProvider, StockPriceSimulator>();
 builder.Services.AddHostedService<StockPriceSimulator>();
 
 builder.Services.AddScoped<IAlertService, AlertService>();
+builder.Services.AddScoped<IStockPriceService, StockPriceService>();
+builder.Services.AddScoped<INotificationService, SignalRNotificationService>();
+builder.Services.AddScoped<IAlertEvaluationService, AlertEvaluationService>();
+builder.Services.AddSignalR();
 
 builder.Services.AddAutoMapper(typeof(AlertMappingProfile));
 
@@ -20,6 +26,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.MapHub<AlertHub>("/alerts");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

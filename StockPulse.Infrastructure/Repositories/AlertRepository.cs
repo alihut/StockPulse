@@ -26,6 +26,20 @@ public class AlertRepository : IAlertRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Alert>> GetActiveAlertsBySymbolAsync(string symbol)
+    {
+        return await _context.Alerts
+            .Where(a => a.Symbol == symbol && a.IsActive)
+            .ToListAsync();
+    }
+
+    public async Task UpdateAsync(Alert alert)
+    {
+        _context.Alerts.Update(alert);
+        await _context.SaveChangesAsync();
+    }
+
+
     public async Task DeleteAlertAsync(Guid alertId)
     {
         var alert = await _context.Alerts.FindAsync(alertId);

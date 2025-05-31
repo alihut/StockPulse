@@ -1,10 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using StockPulse.Domain.Entities;
+using System.Reflection;
 
 namespace StockPulse.Infrastructure.Data
 {
@@ -17,10 +13,13 @@ namespace StockPulse.Infrastructure.Data
 
         public DbSet<StockPrice> StockPrices { get; set; }
 
+        public DbSet<User> Users { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Alert>().HasKey(a => a.Id);
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
     }
 }

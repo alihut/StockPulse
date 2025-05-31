@@ -10,6 +10,7 @@ namespace StockPulse.API.Mappings
         {
             CreateMap<CreateAlertRequestDto, Alert>();
             CreateMap<Alert, AlertDto>();
+            CreateMap<RecordPriceRequestDto, StockPrice>();
         }
     }
 }
