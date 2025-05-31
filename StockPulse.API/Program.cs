@@ -25,6 +25,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+
+
 var app = builder.Build();
 
 app.MapHub<AlertHub>("/alerts");

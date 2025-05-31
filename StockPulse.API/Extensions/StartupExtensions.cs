@@ -51,6 +51,8 @@ namespace StockPulse.API.Extensions
 
         public static void AddApplicationServices(this WebApplicationBuilder builder)
         {
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddScoped<IUserContext, UserContext>();
             builder.Services.AddHostedService<StockPriceSimulator>();
 
             builder.Services.AddScoped<ISymbolValidator, SymbolValidator>();

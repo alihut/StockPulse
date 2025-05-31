@@ -10,12 +10,18 @@ public class AlertService : IAlertService
     private readonly IAlertRepository _alertRepository;
     private readonly IMapper _mapper;
     private readonly ISymbolValidator _symbolValidator;
+    private readonly IUserContext _userContext;
 
-    public AlertService(IAlertRepository alertRepository, IMapper mapper, ISymbolValidator symbolValidator)
+    public AlertService(
+        IAlertRepository alertRepository, 
+        IMapper mapper, 
+        ISymbolValidator symbolValidator,
+        IUserContext userContext)
     {
         _alertRepository = alertRepository;
         _mapper = mapper;
         _symbolValidator = symbolValidator;
+        _userContext = userContext;
     }
 
     public async Task<Result<Guid>> RegisterAlertAsync(CreateAlertRequestDto request)
@@ -27,17 +33,17 @@ public class AlertService : IAlertService
             return Result.Failure<Guid>(StatusCode.BadRequest, "Invalid PriceThreshold");
 
         var alert = _mapper.Map<Alert>(request);
-        alert.Id = Guid.NewGuid();
         alert.IsActive = true;
+        alert.UserId = _userContext.GetUserId();
 
         await _alertRepository.AddAlertAsync(alert);
 
         return Result.Success<Guid>(alert.Id);
     }
 
-    public async Task<Result<IEnumerable<AlertDto>>> GetUserAlertsAsync(Guid userId)
+    public async Task<Result<IEnumerable<AlertDto>>> GetUserAlertsAsync()
     {
-        var alerts = await _alertRepository.GetActiveAlertsAsync(userId);
+        var alerts = await _alertRepository.GetActiveAlertsAsync(_userContext.GetUserId());
         return Result.Success(_mapper.Map<IEnumerable<AlertDto>>(alerts));
     }
 

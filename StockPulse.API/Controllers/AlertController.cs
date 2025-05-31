@@ -22,9 +22,9 @@ public class AlertController : ControllerBase
     }
 
     [HttpGet("{userId}")]
-    public async Task<IActionResult> GetAlerts(Guid userId)
+    public async Task<IActionResult> GetAlerts()
     {
-        var alerts = await _service.GetUserAlertsAsync(userId);
+        var alerts = await _service.GetUserAlertsAsync();
         return Ok(alerts);
     }
 
