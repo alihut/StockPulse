@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using StockPulse.API.Extensions;
 using StockPulse.API.Hubs;
 using StockPulse.API.Mappings;
+using StockPulse.API.Middlewares;
 using StockPulse.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +34,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
