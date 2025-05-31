@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StockPulse.Application.DTOs;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class AlertController : ControllerBase
