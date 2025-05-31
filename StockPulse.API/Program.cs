@@ -15,6 +15,7 @@ builder.Services.AddDbContext<StockPulseDbContext>(options =>
 builder.AddJwtAuthentication();
 
 builder.AddApplicationServices();
+builder.AddRepositories();
 builder.Services.AddSignalR();
 
 builder.Services.AddAutoMapper(typeof(AlertMappingProfile));

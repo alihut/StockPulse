@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StockPulse.Application.DTOs;
 using StockPulse.Application.Interfaces;
@@ -10,13 +12,16 @@ namespace StockPulse.Application.Services
     {
         private readonly List<string> _symbols;
         private readonly Random _random = new();
-        private readonly IStockPriceService _stockPriceService;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<StockPriceSimulator> _logger;
 
         public StockPriceSimulator(
-            IStockPriceService stockPriceService, 
-            IOptions<StockSettings> stockSettingsOptions)
+            IServiceProvider serviceProvider,
+            IOptions<StockSettings> stockSettingsOptions,
+            ILogger<StockPriceSimulator> logger)
         {
-            _stockPriceService = stockPriceService;
+            _serviceProvider = serviceProvider;
+            _logger = logger;
             _symbols = stockSettingsOptions.Value.Symbols;
         }
 
@@ -24,20 +29,25 @@ namespace StockPulse.Application.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                foreach (var symbol in _symbols)
+                using (var scope = _serviceProvider.CreateScope())
                 {
-                    var basePrice = 100 + _random.Next(50);
-                    var changePercent = (decimal)(_random.NextDouble() * 0.05 - 0.025); // ±2.5%
-                    var newPrice = basePrice + basePrice * changePercent;
-                    var rounded = Math.Round(newPrice, 2);
-
-                    Console.WriteLine($"[Simulator] Symbol: {symbol} | Price: {rounded} | Time: {DateTime.UtcNow}");
-
-                    await _stockPriceService.RecordPriceAsync(new RecordPriceRequestDto
+                    var stockPriceService = scope.ServiceProvider.GetRequiredService<IStockPriceService>();
+                    
+                    foreach (var symbol in _symbols)
                     {
-                        Symbol = symbol,
-                        Price = rounded
-                    });
+                        var basePrice = 100 + _random.Next(50);
+                        var changePercent = (decimal)(_random.NextDouble() * 0.05 - 0.025); // ±2.5%
+                        var newPrice = basePrice + basePrice * changePercent;
+                        var rounded = Math.Round(newPrice, 2);
+
+                        _logger.LogInformation($"[Simulator] Symbol: {symbol} | Price: {rounded} | Time: {DateTime.UtcNow}");
+
+                        await stockPriceService.RecordPriceAsync(new RecordPriceRequestDto
+                        {
+                            Symbol = symbol,
+                            Price = rounded
+                        });
+                    }
                 }
 
                 await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);

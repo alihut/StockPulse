@@ -6,6 +6,7 @@ using StockPulse.API.Services;
 using StockPulse.Application.Interfaces;
 using StockPulse.Application.Services;
 using StockPulse.Application.Settings;
+using StockPulse.Infrastructure.Repositories;
 using StockPulse.Infrastructure.Services;
 
 namespace StockPulse.API.Extensions
@@ -58,6 +59,13 @@ namespace StockPulse.API.Extensions
             builder.Services.AddScoped<IStockPriceService, StockPriceService>();
             builder.Services.AddScoped<INotificationService, SignalRNotificationService>();
             builder.Services.AddScoped<IAlertEvaluationService, AlertEvaluationService>();
+        }
+
+        public static void AddRepositories(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IAlertRepository, AlertRepository>();
+            builder.Services.AddScoped<IStockPriceRepository, StockPriceRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
         }
     }
 }
