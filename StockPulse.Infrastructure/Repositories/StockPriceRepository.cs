@@ -2,6 +2,8 @@
 using StockPulse.Domain.Entities;
 using StockPulse.Infrastructure.Data;
 
+namespace StockPulse.Infrastructure.Repositories;
+
 public class StockPriceRepository : IStockPriceRepository
 {
     private readonly StockPulseDbContext _context;

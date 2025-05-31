@@ -2,6 +2,8 @@
 using StockPulse.Application.Helpers;
 using StockPulse.Domain.Entities;
 
+namespace StockPulse.Infrastructure.Configurations;
+
 public class UserConfiguration : BaseEntityConfiguration<User>
 {
     public override void Configure(EntityTypeBuilder<User> builder)
@@ -20,17 +22,50 @@ public class UserConfiguration : BaseEntityConfiguration<User>
 
     private void SeedData(EntityTypeBuilder<User> builder)
     {
-        var password = "Password123"; // Example shared password
+        var password = "Password123";
         var passwordHash = HashHelper.HashPassword(password);
+        var createdAt = new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc);
 
-        var users = Enumerable.Range(1, 5).Select(i => new User
+        var users = new[]
         {
-            Id = Guid.NewGuid(),
-            CreatedAt = DateTime.UtcNow,
-            Username = $"user{i}",
-            PasswordHash = passwordHash
-        });
+            new User
+            {
+                Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                CreatedAt = createdAt,
+                Username = "user1",
+                PasswordHash = passwordHash
+            },
+            new User
+            {
+                Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+                CreatedAt = createdAt,
+                Username = "user2",
+                PasswordHash = passwordHash
+            },
+            new User
+            {
+                Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+                CreatedAt = createdAt,
+                Username = "user3",
+                PasswordHash = passwordHash
+            },
+            new User
+            {
+                Id = Guid.Parse("44444444-4444-4444-4444-444444444444"),
+                CreatedAt = createdAt,
+                Username = "user4",
+                PasswordHash = passwordHash
+            },
+            new User
+            {
+                Id = Guid.Parse("55555555-5555-5555-5555-555555555555"),
+                CreatedAt = createdAt,
+                Username = "user5",
+                PasswordHash = passwordHash
+            }
+        };
 
         builder.HasData(users);
     }
+
 }

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using StockPulse.Application.DTOs;
+using StockPulse.Application.Enums;
 using StockPulse.Application.Interfaces;
+using StockPulse.Application.Models;
 using StockPulse.Domain.Entities;
 
 public class AlertService : IAlertService
@@ -16,27 +18,33 @@ public class AlertService : IAlertService
         _symbolValidator = symbolValidator;
     }
 
-    public async Task RegisterAlertAsync(CreateAlertRequestDto request)
+    public async Task<Result<Guid>> RegisterAlertAsync(CreateAlertRequestDto request)
     {
         if (!_symbolValidator.IsValid(request.Symbol))
-            throw new ArgumentException("Invalid stock symbol.");
+            return Result.Failure<Guid>(StatusCode.BadRequest, "Invalid stock symbol.");
+
+        if(request.PriceThreshold < 0)
+            return Result.Failure<Guid>(StatusCode.BadRequest, "Invalid PriceThreshold");
 
         var alert = _mapper.Map<Alert>(request);
         alert.Id = Guid.NewGuid();
-        //alert.CreatedAt = DateTime.UtcNow;
         alert.IsActive = true;
 
         await _alertRepository.AddAlertAsync(alert);
+
+        return Result.Success<Guid>(alert.Id);
     }
 
-    public async Task<IEnumerable<AlertDto>> GetUserAlertsAsync(Guid userId)
+    public async Task<Result<IEnumerable<AlertDto>>> GetUserAlertsAsync(Guid userId)
     {
         var alerts = await _alertRepository.GetActiveAlertsAsync(userId);
-        return _mapper.Map<IEnumerable<AlertDto>>(alerts);
+        return Result.Success(_mapper.Map<IEnumerable<AlertDto>>(alerts));
     }
 
-    public async Task DeleteAlertAsync(Guid id)
+    public async Task<Result> DeleteAlertAsync(Guid id)
     {
         await _alertRepository.DeleteAlertAsync(id);
+
+        return Result.Success();
     }
 }

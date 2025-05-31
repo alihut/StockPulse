@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StockPulse.Domain.Entities;
 
 namespace StockPulse.Infrastructure.Configurations
@@ -14,7 +15,9 @@ namespace StockPulse.Infrastructure.Configurations
                 .HasMaxLength(10);
 
             builder.Property(p => p.Price)
-                .IsRequired();
+                .IsRequired().HasPrecision(18, 2);
+
+            builder.HasCheckConstraint("CK_StockPrice_Price_NonNegative", "[Price] >= 0");
         }
     }
 
