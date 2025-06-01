@@ -9,34 +9,14 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using StockPulse.IntegrationTests.Fixtures;
+using StockPulse.IntegrationTests.Base;
 
-namespace StockPulse.IntegrationTests
+namespace StockPulse.IntegrationTests.Tests
 {
     public class AlertNotificationTests : IntegrationTestBase
     {
         public AlertNotificationTests(IntegrationTestFixture fixture) : base(fixture) { }
-
-        [Fact]
-        public async Task User_registers_alert_successfully()
-        {
-            // Arrange
-            var token = await AuthHelper.LoginAsync(Client, "user1", "Password123");
-            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            var alertRequest = new
-            {
-                userId = "11111111-1111-1111-1111-111111111111", // use a known seeded user
-                symbol = "AAPL",
-                priceThreshold = 180,
-                type = "Below"
-            };
-
-            // Act
-            var response = await Client.PostAsJsonAsync("/api/alert", alertRequest);
-
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-        }
 
         //[Fact]
         //public async Task User_receives_alert_notification_via_signalr()

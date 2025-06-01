@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StockPulse.IntegrationTests
+namespace StockPulse.IntegrationTests.Fixtures
 {
-    public class IntegrationTestFixture : WebApplicationFactory<StockPulse.API.Program>
+    public class IntegrationTestFixture : WebApplicationFactory<API.Program>
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {

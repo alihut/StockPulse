@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using StockPulse.IntegrationTests.Fixtures;
 
-namespace StockPulse.IntegrationTests
+namespace StockPulse.IntegrationTests.Base
 {
     [Collection("IntegrationTestCollection")]
     public abstract class IntegrationTestBase

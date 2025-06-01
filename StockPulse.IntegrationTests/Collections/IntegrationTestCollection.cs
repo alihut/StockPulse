@@ -1,10 +1,11 @@
-﻿using System;
+﻿using StockPulse.IntegrationTests.Fixtures;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StockPulse.IntegrationTests
+namespace StockPulse.IntegrationTests.Collections
 {
     [CollectionDefinition("IntegrationTestCollection")]
     public class IntegrationTestCollection : ICollectionFixture<IntegrationTestFixture>
