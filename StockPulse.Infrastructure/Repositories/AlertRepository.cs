@@ -14,12 +14,11 @@ public class AlertRepository : IAlertRepository
         _context = context;
     }
 
-    public async Task<bool> ExistsAsync(Guid userId, string symbol, decimal threshold, AlertType type)
+    public async Task<bool> ExistsAsync(Guid userId, string symbol, AlertType type)
     {
         return await _context.Alerts.AnyAsync(a =>
             a.UserId == userId &&
             a.Symbol == symbol &&
-            a.PriceThreshold == threshold &&
             a.Type == type &&
             a.IsActive);
     }

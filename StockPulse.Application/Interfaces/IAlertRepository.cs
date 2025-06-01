@@ -6,7 +6,7 @@ namespace StockPulse.Application.Interfaces
 {
     public interface IAlertRepository
     {
-        Task<bool> ExistsAsync(Guid userId, string symbol, decimal threshold, AlertType type);
+        Task<bool> ExistsAsync(Guid userId, string symbol, AlertType type);
         Task AddAlertAsync(Alert alert);
         Task<IEnumerable<Alert>> GetActiveAlertsAsync(Guid userId);
 

@@ -34,9 +34,9 @@ public class AlertService : IAlertService
 
         var userId = _userContext.GetUserId();
 
-        var alreadyExists = await _alertRepository.ExistsAsync(userId, request.Symbol, request.PriceThreshold, request.Type);
+        var alreadyExists = await _alertRepository.ExistsAsync(userId, request.Symbol, request.Type);
         if (alreadyExists)
-            return Result.Failure<Guid>(StatusCode.Conflict, "An identical alert already exists.");
+            return Result.Failure<Guid>(StatusCode.Conflict, $"An alert for '{request.Symbol}' and '{request.Type}' already exists. Please delete it first");
 
         var alert = _mapper.Map<Alert>(request);
         alert.IsActive = true;
