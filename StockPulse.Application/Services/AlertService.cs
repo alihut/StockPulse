@@ -32,6 +32,12 @@ public class AlertService : IAlertService
         if(request.PriceThreshold < 0)
             return Result.Failure<Guid>(StatusCode.BadRequest, "Invalid PriceThreshold");
 
+        var userId = _userContext.GetUserId();
+
+        var alreadyExists = await _alertRepository.ExistsAsync(userId, request.Symbol, request.PriceThreshold, request.Type);
+        if (alreadyExists)
+            return Result.Failure<Guid>(StatusCode.Conflict, "An identical alert already exists.");
+
         var alert = _mapper.Map<Alert>(request);
         alert.IsActive = true;
         alert.UserId = _userContext.GetUserId();

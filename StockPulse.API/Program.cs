@@ -1,4 +1,5 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using StockPulse.API.Extensions;
 using StockPulse.API.Hubs;
 using StockPulse.API.Mappings;
@@ -20,10 +21,77 @@ builder.Services.AddSignalR();
 
 builder.Services.AddAutoMapper(typeof(AlertMappingProfile));
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173") //  allow Vite dev server
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); // optional if using cookies or SignalR auth
+    });
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen(options =>
+//{
+//    options.SwaggerDoc("v1", new() { Title = "StockPulse API", Version = "v1" });
+
+//    var securityScheme = new OpenApiSecurityScheme
+//    {
+//        Name = "Authorization",
+//        Type = SecuritySchemeType.Http,
+//        Scheme = "bearer",
+//        BearerFormat = "JWT",
+//        In = ParameterLocation.Header,
+//        Description = "Enter your JWT token in the format: Bearer {token}"
+//    };
+
+//    options.AddSecurityDefinition("Bearer", securityScheme);
+
+//    var securityRequirement = new OpenApiSecurityRequirement
+//    {
+//        {
+//            securityScheme,
+//            new[] { "Bearer" }
+//        }
+//    };
+
+//    options.AddSecurityRequirement(securityRequirement);
+//});
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new() { Title = "StockPulse API", Version = "v1" });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter your JWT token in the format: Bearer {token}"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer" // This MUST match the AddSecurityDefinition key
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
@@ -43,8 +111,11 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors();
 
 app.Run();

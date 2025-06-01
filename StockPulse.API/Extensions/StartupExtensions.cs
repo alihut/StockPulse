@@ -55,8 +55,10 @@ namespace StockPulse.API.Extensions
             builder.Services.AddScoped<IUserContext, UserContext>();
             builder.Services.AddHostedService<StockPriceSimulator>();
 
-            builder.Services.AddScoped<ISymbolValidator, SymbolValidator>();
+            builder.Services.AddSingleton<ISymbolValidator, SymbolValidator>();
+            builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
+            builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAlertService, AlertService>();
             builder.Services.AddScoped<IStockPriceService, StockPriceService>();
             builder.Services.AddScoped<INotificationService, SignalRNotificationService>();

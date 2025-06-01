@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StockPulse.Application.DTOs;
+using StockPulse.Application.Interfaces;
 
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class AlertController : ControllerBase
 {
-    private readonly AlertService _service;
+    private readonly IAlertService _service;
 
-    public AlertController(AlertService service)
+    public AlertController(IAlertService service)
     {
         _service = service;
     }
@@ -21,7 +22,7 @@ public class AlertController : ControllerBase
         return Ok();
     }
 
-    [HttpGet("{userId}")]
+    [HttpGet()]
     public async Task<IActionResult> GetAlerts()
     {
         var alerts = await _service.GetUserAlertsAsync();
