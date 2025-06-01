@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StockPulse.API.Extensions;
 using StockPulse.Application.DTOs;
 using StockPulse.Application.Interfaces;
 
@@ -18,21 +19,21 @@ public class AlertController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> RegisterAlert([FromBody] CreateAlertRequestDto request)
     {
-        await _service.RegisterAlertAsync(request);
-        return Ok();
+        var response = await _service.RegisterAlertAsync(request);
+        return response.ToActionResult();
     }
 
     [HttpGet()]
     public async Task<IActionResult> GetAlerts()
     {
-        var alerts = await _service.GetUserAlertsAsync();
-        return Ok(alerts);
+        var response = await _service.GetUserAlertsAsync();
+        return response.ToActionResult();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _service.DeleteAlertAsync(id);
-        return NoContent();
+        var response = await _service.DeleteAlertAsync(id);
+        return response.ToActionResult();
     }
 }

@@ -27,7 +27,7 @@ namespace StockPulse.IntegrationTests.Tests
                 Type = 0
             };
 
-            await Client.PostAsJsonAsync("/api/alert", alertRequest);
+            //await Client.PostAsJsonAsync("/api/alert", alertRequest);
             var response = await Client.PostAsJsonAsync("/api/alert", alertRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.Conflict);
