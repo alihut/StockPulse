@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using StockPulse.Application.DTOs;
 using StockPulse.Application.Interfaces;
 using StockPulse.Application.Settings;
+using StockPulse.Messaging.Events;
 
 namespace StockPulse.Application.Services
 {
@@ -13,14 +14,20 @@ namespace StockPulse.Application.Services
         private readonly List<string> _symbols;
         private readonly Random _random = new();
         private readonly IServiceProvider _serviceProvider;
+        private readonly IEventPublisher _eventPublisher;
+        private readonly IStockPricePublisherService _stockPricePublisherService;
         private readonly ILogger<StockPriceSimulator> _logger;
 
         public StockPriceSimulator(
             IServiceProvider serviceProvider,
             IOptions<StockSettings> stockSettingsOptions,
+            IEventPublisher eventPublisher,
+            IStockPricePublisherService stockPricePublisherService,
             ILogger<StockPriceSimulator> logger)
         {
             _serviceProvider = serviceProvider;
+            _eventPublisher = eventPublisher;
+            _stockPricePublisherService = stockPricePublisherService;
             _logger = logger;
             _symbols = stockSettingsOptions.Value.Symbols;
         }
@@ -29,30 +36,36 @@ namespace StockPulse.Application.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                using (var scope = _serviceProvider.CreateScope())
-                {
-                    var stockPriceService = scope.ServiceProvider.GetRequiredService<IStockPriceService>();
-                    
-                    foreach (var symbol in _symbols)
-                    {
-                        var basePrice = 100 + _random.Next(50);
-                        var changePercent = (decimal)(_random.NextDouble() * 0.05 - 0.025); // ±2.5%
-                        var newPrice = basePrice + basePrice * changePercent;
-                        var rounded = Math.Round(newPrice, 2);
+                var recordList = GeneratePriceRecords();
 
-                        _logger.LogInformation($"[Simulator] Symbol: {symbol} | Price: {rounded} | Time: {DateTime.UtcNow}");
-
-                        await stockPriceService.RecordPriceAsync(new RecordPriceRequestDto
-                        {
-                            Symbol = symbol,
-                            Price = rounded
-                        });
-                    }
-                }
+                await _stockPricePublisherService.RecordAndPublishAsync(recordList);
 
                 await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);
             }
 
+        }
+
+        private List<RecordPriceRequestDto> GeneratePriceRecords()
+        {
+            var recordList = new List<RecordPriceRequestDto>();
+
+            foreach (var symbol in _symbols)
+            {
+                var basePrice = 100 + _random.Next(50);
+                var changePercent = (decimal)(_random.NextDouble() * 0.05 - 0.025);
+                var newPrice = basePrice + basePrice * changePercent;
+                var rounded = Math.Round(newPrice, 2);
+
+                _logger.LogInformation($"[Simulator] Symbol: {symbol} | Price: {rounded} | Time: {DateTime.UtcNow}");
+
+                recordList.Add(new RecordPriceRequestDto
+                {
+                    Symbol = symbol,
+                    Price = rounded
+                });
+            }
+
+            return recordList;
         }
     }
 }

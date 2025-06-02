@@ -1,5 +1,6 @@
 ﻿using StockPulse.Application.Interfaces;
 using StockPulse.Domain.Enums;
+using StockPulse.Messaging.Events;
 
 namespace StockPulse.Application.Services
 {
@@ -14,30 +15,37 @@ namespace StockPulse.Application.Services
             _notificationService = notificationService;
         }
 
-        public async Task EvaluateAlertsAsync(string symbol, decimal newPrice)
+        public async Task EvaluateAlertsAsync(List<PriceChangedDto> prices)
         {
-            var alerts = await _alertRepo.GetActiveAlertsBySymbolAsync(symbol);
+            var symbols = prices.Select(p => p.Symbol).Distinct();
+            var alerts = await _alertRepo.GetActiveAlertsBySymbolsAsync(symbols);
 
-            foreach (var alert in alerts)
+            foreach (var priceChange in prices)
             {
-                bool shouldTrigger =
-                    (alert.Type == AlertType.Above && newPrice > alert.PriceThreshold) ||
-                    (alert.Type == AlertType.Below && newPrice < alert.PriceThreshold);
+                var matchingAlerts = alerts.Where(a => a.Symbol == priceChange.Symbol).ToList();
 
-                if (shouldTrigger)
+                foreach (var alert in matchingAlerts)
                 {
-                    alert.IsActive = false;
-                    await _alertRepo.UpdateAsync(alert);
+                    bool shouldTrigger =
+                        (alert.Type == AlertType.Above && priceChange.NewPrice > alert.PriceThreshold) ||
+                        (alert.Type == AlertType.Below && priceChange.NewPrice < alert.PriceThreshold);
 
-                    await _notificationService.NotifyUserAsync(alert.UserId, new
+                    if (shouldTrigger)
                     {
-                        Symbol = alert.Symbol,
-                        Price = newPrice,
-                        TriggeredAt = DateTime.UtcNow
-                    });
+                        alert.IsActive = false;
+                        await _alertRepo.UpdateAsync(alert);
+
+                        await _notificationService.NotifyUserAsync(alert.UserId, new
+                        {
+                            Symbol = alert.Symbol,
+                            Price = priceChange.NewPrice,
+                            TriggeredAt = DateTime.UtcNow
+                        });
+                    }
                 }
             }
         }
+
     }
 
 }

@@ -1,7 +1,9 @@
-﻿namespace StockPulse.Application.Interfaces
+﻿using StockPulse.Messaging.Events;
+
+namespace StockPulse.Application.Interfaces
 {
     public interface IAlertEvaluationService
     {
-        Task EvaluateAlertsAsync(string symbol, decimal newPrice);
+        Task EvaluateAlertsAsync(List<PriceChangedDto> prices);
     }
 }

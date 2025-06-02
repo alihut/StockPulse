@@ -18,4 +18,10 @@ public class StockPriceRepository : IStockPriceRepository
         _context.StockPrices.Add(price);
         await _context.SaveChangesAsync();
     }
+
+    public async Task AddAsync(IEnumerable<StockPrice> prices)
+    {
+        _context.StockPrices.AddRange(prices);
+        await _context.SaveChangesAsync();
+    }
 }

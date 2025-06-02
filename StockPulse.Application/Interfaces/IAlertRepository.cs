@@ -11,6 +11,9 @@ namespace StockPulse.Application.Interfaces
         Task<IEnumerable<Alert>> GetActiveAlertsAsync(Guid userId);
 
         Task<IEnumerable<Alert>> GetActiveAlertsBySymbolAsync(string symbol);
+
+        Task<List<Alert>> GetActiveAlertsBySymbolsAsync(IEnumerable<string> symbols);
+
         Task UpdateAsync(Alert alert);
 
         Task DeleteAlertAsync(Guid alertId);

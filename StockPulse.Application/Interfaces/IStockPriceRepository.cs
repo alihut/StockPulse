@@ -1,4 +1,5 @@
-﻿using StockPulse.Domain.Entities;
+﻿using StockPulse.Application.DTOs;
+using StockPulse.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,6 @@ namespace StockPulse.Application.Interfaces
     public interface IStockPriceRepository
     {
         Task AddAsync(StockPrice price);
+        Task AddAsync(IEnumerable<StockPrice> prices);
     }
 }

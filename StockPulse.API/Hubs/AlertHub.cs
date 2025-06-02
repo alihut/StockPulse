@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 
 namespace StockPulse.API.Hubs
 {
+    [Authorize]
     public class AlertHub : Hub
     {
         // Called when a client connects

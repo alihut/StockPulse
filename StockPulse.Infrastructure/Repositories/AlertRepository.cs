@@ -43,6 +43,13 @@ public class AlertRepository : IAlertRepository
             .ToListAsync();
     }
 
+    public async Task<List<Alert>> GetActiveAlertsBySymbolsAsync(IEnumerable<string> symbols)
+    {
+        return await _context.Alerts
+            .Where(a => a.IsActive && symbols.Contains(a.Symbol))
+            .ToListAsync();
+    }
+
     public async Task UpdateAsync(Alert alert)
     {
         _context.Alerts.Update(alert);

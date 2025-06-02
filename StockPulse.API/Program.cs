@@ -5,6 +5,7 @@ using StockPulse.API.Hubs;
 using StockPulse.API.Mappings;
 using StockPulse.API.Middlewares;
 using StockPulse.Infrastructure.Data;
+using StockPulse.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,7 @@ builder.AddJwtAuthentication();
 
 builder.AddApplicationServices();
 builder.AddRepositories();
+builder.Services.AddMassTransitWithRabbitMq(builder.Configuration);
 builder.Services.AddSignalR();
 
 builder.Services.AddAutoMapper(typeof(AlertMappingProfile));
@@ -35,33 +37,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
-//builder.Services.AddSwaggerGen(options =>
-//{
-//    options.SwaggerDoc("v1", new() { Title = "StockPulse API", Version = "v1" });
 
-//    var securityScheme = new OpenApiSecurityScheme
-//    {
-//        Name = "Authorization",
-//        Type = SecuritySchemeType.Http,
-//        Scheme = "bearer",
-//        BearerFormat = "JWT",
-//        In = ParameterLocation.Header,
-//        Description = "Enter your JWT token in the format: Bearer {token}"
-//    };
-
-//    options.AddSecurityDefinition("Bearer", securityScheme);
-
-//    var securityRequirement = new OpenApiSecurityRequirement
-//    {
-//        {
-//            securityScheme,
-//            new[] { "Bearer" }
-//        }
-//    };
-
-//    options.AddSecurityRequirement(securityRequirement);
-//});
 
 builder.Services.AddSwaggerGen(options =>
 {

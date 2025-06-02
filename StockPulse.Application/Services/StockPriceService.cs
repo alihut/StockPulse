@@ -9,21 +9,23 @@ namespace StockPulse.Application.Services
     {
         private readonly IStockPriceRepository _repository;
         private readonly IMapper _mapper;
-        private readonly IAlertEvaluationService _alertEvaluationService;
 
         public StockPriceService(IStockPriceRepository repository, 
-            IMapper mapper,
-            IAlertEvaluationService alertEvaluationService)
+            IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;
-            _alertEvaluationService = alertEvaluationService;
         }
         public async Task RecordPriceAsync(RecordPriceRequestDto request)
         {
             var stockPrice = _mapper.Map<StockPrice>(request);
             await _repository.AddAsync(stockPrice);
-            await _alertEvaluationService.EvaluateAlertsAsync(request.Symbol, request.Price);
+        }
+
+        public async Task RecordPricesAsync(IEnumerable<RecordPriceRequestDto> prices)
+        {
+            var stockPrices = _mapper.Map<IEnumerable<StockPrice>>(prices);
+            await _repository.AddAsync(stockPrices);
         }
     }
 }
