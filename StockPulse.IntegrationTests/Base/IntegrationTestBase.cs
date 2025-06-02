@@ -1,4 +1,9 @@
-﻿using StockPulse.IntegrationTests.Fixtures;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using StockPulse.Infrastructure.Data;
+using StockPulse.IntegrationTests.Fixtures;
+using StockPulse.IntegrationTests.Helpers;
+using System.Net.Http.Headers;
 
 namespace StockPulse.IntegrationTests.Base
 {
@@ -13,6 +18,17 @@ namespace StockPulse.IntegrationTests.Base
             Factory = fixture;
             Client = Factory.CreateClient();
         }
+
+        protected async Task<string> LoginAsAsync(string username = "user1", string password = "Password123")
+        {
+            return await AuthHelper.LoginAsync(Client, username, password);
+        }
+
+        protected void AuthenticateClient(string token)
+        {
+            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+
     }
 
 }

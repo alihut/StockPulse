@@ -53,8 +53,12 @@ namespace StockPulse.API.Extensions
         {
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<IUserContext, UserContext>();
-            builder.Services.AddHostedService<StockPriceSimulator>();
 
+            if (!Environment.GetEnvironmentVariable("DISABLE_SIMULATOR").Equals("true"))
+            {
+                builder.Services.AddHostedService<StockPriceSimulator>();
+            }
+            
             builder.Services.AddSingleton<ISymbolValidator, SymbolValidator>();
             builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 

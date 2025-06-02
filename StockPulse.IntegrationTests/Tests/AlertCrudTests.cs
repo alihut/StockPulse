@@ -8,50 +8,55 @@ using FluentAssertions;
 
 namespace StockPulse.IntegrationTests.Tests
 {
-    public class AlertCrudTests : IntegrationTestBase
+    public class AlertCrudTests : IntegrationTestBase, IAsyncLifetime
     {
         public AlertCrudTests(IntegrationTestFixture fixture) : base(fixture)
         {
         }
 
+        public async Task InitializeAsync() => await Factory.ResetDatabaseAsync();
+        public async Task DisposeAsync() => await Factory.ResetDatabaseAsync();
+
         [Fact]
         public async Task Returns_Conflict_When_Alert_Already_Exists()
         {
-            var token = await AuthHelper.LoginAsync(Client, "user1", "Password123");
-            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            // Arrange
+            var token = await LoginAsAsync(); // defaults to user1
+            AuthenticateClient(token);
 
             var alertRequest = new
             {
                 Symbol = "AAPL",
                 PriceThreshold = 100,
-                Type = 0
+                Type = 0 // AlertType.Above
             };
 
-            //await Client.PostAsJsonAsync("/api/alert", alertRequest);
-            var response = await Client.PostAsJsonAsync("/api/alert", alertRequest);
+            // First alert registration should succeed
+            var firstResponse = await Client.PostAsJsonAsync("/api/alert", alertRequest);
+            firstResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            response.StatusCode.Should().Be(HttpStatusCode.Conflict);
-        }
-
-        [Fact]
-        public async Task User_registers_alert_successfully()
-        {
-            // Arrange
-            var token = await AuthHelper.LoginAsync(Client, "user1", "Password123");
-            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            var alertRequest = new
-            {
-                Symbol = "GOOGL",
-                PriceThreshold = 180,
-                Type = 0
-            };
-
-            // Act
-            var response = await Client.PostAsJsonAsync("/api/alert", alertRequest);
+            // Act - Try to register the same alert again
+            var secondResponse = await Client.PostAsJsonAsync("/api/alert", alertRequest);
 
             // Assert
+            secondResponse.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        }
+
+
+        [Theory]
+        [InlineData("AAPL", 180, 1)] // Below
+        [InlineData("MSFT", 300, 0)] // Above
+        public async Task User_Registers_Alert_Successfully(string symbol, decimal threshold, int type)
+        {
+            var token = await LoginAsAsync(); // defaults to user1
+            AuthenticateClient(token);
+
+            var alertRequest = new { Symbol = symbol, PriceThreshold = threshold, Type = type };
+
+            var response = await Client.PostAsJsonAsync("/api/alert", alertRequest);
+
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
+
     }
 }
