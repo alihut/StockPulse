@@ -4,6 +4,7 @@ using StockPulse.Infrastructure.Data;
 using StockPulse.IntegrationTests.Fixtures;
 using StockPulse.IntegrationTests.Helpers;
 using System.Net.Http.Headers;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace StockPulse.IntegrationTests.Base
 {
@@ -27,6 +28,19 @@ namespace StockPulse.IntegrationTests.Base
         protected void AuthenticateClient(string token)
         {
             Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+
+        protected HubConnection? CreateAlertHubConnectionAsync(string token)
+        {
+            var connection = new HubConnectionBuilder()
+                .WithUrl($"{Client.BaseAddress}alerts", options =>
+                {
+                    options.AccessTokenProvider = () => Task.FromResult(token);
+                    options.HttpMessageHandlerFactory = _ => Factory.Server.CreateHandler();
+                })
+                .WithAutomaticReconnect()
+                .Build();
+            return connection;
         }
 
     }
