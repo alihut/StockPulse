@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using StockPulse.Application.DTOs;
 using StockPulse.Application.Interfaces;
+using StockPulse.Domain.Entities;
+using StockPulse.Domain.Enums;
+using StockPulse.IntegrationTests.Helpers;
 
 namespace StockPulse.IntegrationTests.Tests
 {
@@ -163,78 +166,122 @@ namespace StockPulse.IntegrationTests.Tests
             await connection.DisposeAsync();
         }
 
+        [Theory]
+        [InlineData("AAPL", 180, 170, 1)] // Below threshold
+        [InlineData("MSFT", 290, 300, 0)] // Above threshold
+        public async Task Alert_Is_Deactivated_After_Triggered(string symbol, decimal threshold, decimal triggeredPrice, int alertType)
+        {
+            // Arrange
+            var token = await LoginAsAsync();
+            AuthenticateClient(token);
 
-        //[Theory]
-        //[InlineData("user1", "AAPL", 150, 155, 0)] // Only user1 should receive notification
-        //[InlineData("user2", "TSLA", 700, 710, 0)] // Only user2 should receive notification
-        //public async Task Multiple_Users_Receive_Only_Their_Alerts(string receivingUser, string symbol, decimal threshold, decimal triggeredPrice, int alertType)
-        //{
-        //    // Arrange: Login both users
-        //    var token1 = await LoginAsAsync("user1");
-        //    var token2 = await LoginAsAsync("user2");
+            var connection = CreateAlertHubConnectionAsync(token);
 
-        //    var connection1 = CreateAlertHubConnectionAsync(token1);
-        //    string? received1 = null;
-        //    connection1.On<object>("AlertTriggered", data =>
-        //    {
-        //        received1 = JsonSerializer.Serialize(data);
-        //    });
-        //    await connection1.StartAsync();
+            await connection.StartAsync();
 
-        //    var connection2 = CreateAlertHubConnectionAsync(token2);
-        //    string? received2 = null;
-        //    connection2.On<object>("AlertTriggered", data =>
-        //    {
-        //        received2 = JsonSerializer.Serialize(data);
-        //    });
-        //    await connection2.StartAsync();
+            // Register alert
+            var registerResponse = await Client.PostAsJsonAsync("/api/alert", new
+            {
+                Symbol = symbol,
+                PriceThreshold = threshold,
+                Type = alertType
+            });
 
-        //    Client.DefaultRequestHeaders.Authorization = null;
-        //    // Register alerts
-        //    if (receivingUser == "user1")
-        //    {
-        //        AuthenticateClient(token1);
-        //    }
-        //    else
-        //    {
-        //        AuthenticateClient(token2);
-        //    }
+            registerResponse.EnsureSuccessStatusCode();
 
-        //    var registerResponse = await Client.PostAsJsonAsync("/api/alert", new
-        //    {
-        //        Symbol = symbol,
-        //        PriceThreshold = threshold,
-        //        Type = alertType
-        //    });
+            // Trigger the alert
+            using var scope = Factory.Services.CreateScope();
+            var stockPricePublisherService = scope.ServiceProvider.GetRequiredService<IStockPricePublisherService>();
+            var alertRepo = scope.ServiceProvider.GetRequiredService<IAlertRepository>();
 
-        //    registerResponse.EnsureSuccessStatusCode();
+            await stockPricePublisherService.RecordAndPublishAsync(new RecordPriceRequestDto
+            {
+                Symbol = symbol,
+                Price = triggeredPrice
+            });
 
-        //    // Trigger the alert
-        //    using var scope = Factory.Services.CreateScope();
-        //    var stockService = scope.ServiceProvider.GetRequiredService<IStockPriceService>();
-        //    await stockService.RecordPriceAsync(new RecordPriceRequestDto
-        //    {
-        //        Symbol = symbol,
-        //        Price = triggeredPrice
-        //    });
+            // Assert: wait briefly for processing
+            await Task.Delay(1000);
 
-        //    // Assert
-        //    await Task.Delay(1000);
+            var userId = JwtHelper.GetUserIdFromToken(token);
+            var alertStillExists = await alertRepo.ExistsAsync(userId, symbol, (AlertType)alertType);
+            alertStillExists.Should().BeFalse();
 
-        //    if (receivingUser == "user1")
-        //    {
-        //        received1.Should().NotBeNull();
-        //        received2.Should().BeNull();
-        //    }
-        //    else
-        //    {
-        //        received2.Should().NotBeNull();
-        //        received1.Should().BeNull();
-        //    }
+            await connection.DisposeAsync();
+        }
 
-        //    await connection1.DisposeAsync();
-        //    await connection2.DisposeAsync();
-        //}
+
+        [Theory]
+        [InlineData("user1", "AAPL", 150, 155, 0)] // Only user1 should receive notification
+        [InlineData("user2", "TSLA", 700, 710, 0)] // Only user2 should receive notification
+        public async Task Multiple_Users_Receive_Only_Their_Alerts(string receivingUser, string symbol, decimal threshold, decimal triggeredPrice, int alertType)
+        {
+            // Arrange: Login both users
+            var token1 = await LoginAsAsync("user1");
+            var token2 = await LoginAsAsync("user2");
+
+            var connection1 = CreateAlertHubConnectionAsync(token1);
+            string? received1 = null;
+            connection1.On<object>("AlertTriggered", data =>
+            {
+                received1 = JsonSerializer.Serialize(data);
+            });
+            await connection1.StartAsync();
+
+            var connection2 = CreateAlertHubConnectionAsync(token2);
+            string? received2 = null;
+            connection2.On<object>("AlertTriggered", data =>
+            {
+                received2 = JsonSerializer.Serialize(data);
+            });
+            await connection2.StartAsync();
+
+            Client.DefaultRequestHeaders.Authorization = null;
+            // Register alerts
+            if (receivingUser == "user1")
+            {
+                AuthenticateClient(token1);
+            }
+            else
+            {
+                AuthenticateClient(token2);
+            }
+
+            var registerResponse = await Client.PostAsJsonAsync("/api/alert", new
+            {
+                Symbol = symbol,
+                PriceThreshold = threshold,
+                Type = alertType
+            });
+
+            registerResponse.EnsureSuccessStatusCode();
+
+            // Trigger the alert
+            using var scope = Factory.Services.CreateScope();
+            var stockPricePublisherService = scope.ServiceProvider.GetRequiredService<IStockPricePublisherService>();
+            await stockPricePublisherService.RecordAndPublishAsync(new RecordPriceRequestDto
+            {
+                Symbol = symbol,
+                Price = triggeredPrice
+            });
+
+            // Assert
+            await Task.Delay(1000);
+
+            if (receivingUser == "user1")
+            {
+                received1.Should().NotBeNull();
+                received2.Should().BeNull();
+            }
+            else
+            {
+                received2.Should().NotBeNull();
+                received1.Should().BeNull();
+            }
+
+            await connection1.DisposeAsync();
+            await connection2.DisposeAsync();
+        }
 
 
     }
