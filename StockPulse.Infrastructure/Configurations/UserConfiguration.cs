@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StockPulse.Application.Helpers;
 using StockPulse.Domain.Entities;
+using StockPulse.Domain.Enums;
 
 namespace StockPulse.Infrastructure.Configurations;
 
@@ -61,6 +62,14 @@ public class UserConfiguration : BaseEntityConfiguration<User>
                 Id = Guid.Parse("55555555-5555-5555-5555-555555555555"),
                 CreatedAt = createdAt,
                 Username = "user5",
+                PasswordHash = passwordHash
+            },
+            new User
+            {
+                Id = Guid.Parse("70b0a12c-d1e4-404d-8e9e-6734101c8856"),
+                CreatedAt = createdAt,
+                Username = "admin",
+                UserRole = UserRole.Admin,
                 PasswordHash = passwordHash
             }
         };

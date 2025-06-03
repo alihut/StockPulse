@@ -19,4 +19,9 @@ public class SymbolValidator : ISymbolValidator
     {
         return _validSymbols.Contains(symbol.ToUpperInvariant());
     }
+
+    public bool AllValid(IEnumerable<string> symbols)
+    {
+        return symbols.All(symbol => IsValid(symbol));
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using StockPulse.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace StockPulse.Domain.Entities
 {
@@ -10,5 +11,8 @@ namespace StockPulse.Domain.Entities
         public decimal PriceThreshold { get; set; }
         public AlertType Type { get; set; }
         public bool IsActive { get; set; }
+
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
     }
 }

@@ -102,10 +102,7 @@ namespace StockPulse.API.Extensions
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<IUserContext, UserContext>();
 
-            if (!string.Equals(Environment.GetEnvironmentVariable("DISABLE_SIMULATOR"), "true", StringComparison.OrdinalIgnoreCase))
-            {
-                builder.Services.AddHostedService<StockPriceSimulator>();
-            }
+            builder.AddStockPriceSimulator();
 
             builder.Services.AddSingleton<ISymbolValidator, SymbolValidator>();
             builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
@@ -117,6 +114,22 @@ namespace StockPulse.API.Extensions
             builder.Services.AddScoped<IStockPricePublisherService, StockPricePublisherService>();
             builder.Services.AddScoped<INotificationService, SignalRNotificationService>();
             builder.Services.AddScoped<IAlertEvaluationService, AlertEvaluationService>();
+        }
+
+        private static void AddStockPriceSimulator(this WebApplicationBuilder builder)
+        {
+            var disableViaEnv = string.Equals(
+                Environment.GetEnvironmentVariable("DISABLE_SIMULATOR"),
+                "true",
+                StringComparison.OrdinalIgnoreCase
+            );
+
+            var simulatorEnabled = builder.Configuration.GetValue<bool>("EnableBackgroundSimulator");
+
+            if (simulatorEnabled && !disableViaEnv)
+            {
+                builder.Services.AddHostedService<StockPriceSimulator>();
+            }
         }
 
         public static void AddRepositories(this WebApplicationBuilder builder)

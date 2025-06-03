@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using StockPulse.Application.Interfaces;
 using StockPulse.Application.Settings;
+using StockPulse.Domain.Enums;
 
 namespace StockPulse.Infrastructure.Services;
 
@@ -17,7 +18,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         _settings = settings.Value;
     }
 
-    public string GenerateToken(Guid userId, string username)
+    public string GenerateToken(Guid userId, string username, UserRole role)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.SecretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -25,7 +26,8 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-            new Claim(JwtRegisteredClaimNames.UniqueName, username)
+            new Claim(JwtRegisteredClaimNames.UniqueName, username),
+            new Claim(ClaimTypes.Role, role.ToString().ToLowerInvariant())
         };
 
         var token = new JwtSecurityToken(

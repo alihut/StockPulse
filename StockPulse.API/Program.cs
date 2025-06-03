@@ -23,21 +23,32 @@ builder.Services.AddSignalR();
 
 builder.Services.AddAutoMapper(typeof(AlertMappingProfile));
 
+//builder.Services.AddCors(options =>
+//{
+//    options.AddDefaultPolicy(policy =>
+//    {
+//        policy
+//            .AllowAnyOrigin() // ⬅️ this disables origin checks
+//            .AllowAnyHeader()
+//            .AllowAnyMethod();
+//    });
+//});
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
         policy
-            .WithOrigins("http://localhost:5173") //  allow Vite dev server
+            .WithOrigins("http://localhost:5173") // veya hangi porttan sunuyorsan
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials(); // optional if using cookies or SignalR auth
+            .AllowCredentials();
     });
 });
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
+builder.Services.AddMemoryCache();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -74,7 +85,6 @@ builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true
 
 var app = builder.Build();
 
-app.MapHub<AlertHub>("/alerts");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -87,11 +97,13 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
+app.UseCors();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<AlertHub>("/alerts");
 
-app.UseCors();
 
 app.Run();

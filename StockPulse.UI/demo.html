@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>StockPulse Demo</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- User Panel -->
+    <div class="panel">
+      <div class="panel-content">
+        <div class="panel-header">
+          <h2>User Panel</h2>
+          <button onclick="logoutUser()" id="logout-btn" title="Logout">✖</button>
+        </div>
+
+        <div id="user-login">
+          <input id="user-username" placeholder="Username" value="user1" />
+          <input id="user-password" type="password" placeholder="Password" value="Password123" />
+          <button onclick="loginUser()">Login</button>
+        </div>
+
+        <div id="user-actions" style="display: none;">
+          <h3>Register Alert</h3>
+          <select id="user-symbol">
+            <option value="AAPL">AAPL</option>
+            <option value="GOOGL">GOOGL</option>
+            <option value="MSFT">MSFT</option>
+            <option value="TSLA">TSLA</option>
+          </select>
+          <input id="user-threshold" placeholder="Threshold (e.g. 150)" type="number" />
+          <select id="user-alert-type">
+            <option value="0">Above</option>
+            <option value="1">Below</option>
+          </select>
+          <button onclick="registerAlert()">Register Alert</button>
+
+          <h3>Active Alerts</h3>
+          <button onclick="getAlerts()">Refresh Alerts</button>
+          <pre id="user-alerts">[ ]</pre>
+
+          <h3>Live Notifications</h3>
+          <pre id="user-log">🔔 Waiting for alerts...</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="panel">
+      <div class="panel-content">
+        <div class="panel-header">
+          <h2>Admin Panel</h2>
+        </div>
+
+        <div id="admin-login">
+          <input id="admin-username" placeholder="Username" value="admin" />
+          <input id="admin-password" type="password" placeholder="Password" value="Password123" />
+          <button onclick="loginAdmin()">Login</button>
+        </div>
+
+        <div id="admin-actions" style="display: none;">
+          <h3>Simulate Stock Price</h3>
+          <select id="admin-symbol">
+            <option value="AAPL">AAPL</option>
+            <option value="GOOGL">GOOGL</option>
+            <option value="MSFT">MSFT</option>
+            <option value="TSLA">TSLA</option>
+          </select>
+          <input id="admin-price" placeholder="Price (e.g. 155)" type="number" />
+          <button onclick="simulatePrice()">Submit Price</button>
+          <pre id="admin-log">📈 No prices submitted yet.</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

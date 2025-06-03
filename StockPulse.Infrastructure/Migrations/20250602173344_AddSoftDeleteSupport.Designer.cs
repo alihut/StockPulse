@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockPulse.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using StockPulse.Infrastructure.Data;
 namespace StockPulse.Infrastructure.Migrations
 {
     [DbContext(typeof(StockPulseDbContext))]
-    partial class StockPulseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250602173344_AddSoftDeleteSupport")]
+    partial class AddSoftDeleteSupport
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -122,9 +125,6 @@ namespace StockPulse.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserRole")
-                        .HasColumnType("int");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -141,7 +141,6 @@ namespace StockPulse.Infrastructure.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             PasswordHash = "AIxwOS46v70PpHu8LtlqqZvUnhWXJ/y6Dy5qvrOp1gE=",
-                            UserRole = 0,
                             Username = "user1"
                         },
                         new
@@ -150,7 +149,6 @@ namespace StockPulse.Infrastructure.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             PasswordHash = "AIxwOS46v70PpHu8LtlqqZvUnhWXJ/y6Dy5qvrOp1gE=",
-                            UserRole = 0,
                             Username = "user2"
                         },
                         new
@@ -159,7 +157,6 @@ namespace StockPulse.Infrastructure.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             PasswordHash = "AIxwOS46v70PpHu8LtlqqZvUnhWXJ/y6Dy5qvrOp1gE=",
-                            UserRole = 0,
                             Username = "user3"
                         },
                         new
@@ -168,7 +165,6 @@ namespace StockPulse.Infrastructure.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             PasswordHash = "AIxwOS46v70PpHu8LtlqqZvUnhWXJ/y6Dy5qvrOp1gE=",
-                            UserRole = 0,
                             Username = "user4"
                         },
                         new
@@ -177,17 +173,7 @@ namespace StockPulse.Infrastructure.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             PasswordHash = "AIxwOS46v70PpHu8LtlqqZvUnhWXJ/y6Dy5qvrOp1gE=",
-                            UserRole = 0,
                             Username = "user5"
-                        },
-                        new
-                        {
-                            Id = new Guid("70b0a12c-d1e4-404d-8e9e-6734101c8856"),
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            IsDeleted = false,
-                            PasswordHash = "AIxwOS46v70PpHu8LtlqqZvUnhWXJ/y6Dy5qvrOp1gE=",
-                            UserRole = 1,
-                            Username = "admin"
                         });
                 });
 #pragma warning restore 612, 618

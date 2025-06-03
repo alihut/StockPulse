@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using StockPulse.Application.DTOs;
 using StockPulse.Application.Interfaces;
 using StockPulse.Domain.Entities;
 using StockPulse.Domain.Enums;
@@ -20,7 +19,8 @@ public class AlertRepository : IAlertRepository
             a.UserId == userId &&
             a.Symbol == symbol &&
             a.Type == type &&
-            a.IsActive);
+            a.IsActive &&
+            !a.IsDeleted);
     }
 
     public async Task AddAlertAsync(Alert alert)
@@ -59,11 +59,14 @@ public class AlertRepository : IAlertRepository
 
     public async Task DeleteAlertAsync(Guid alertId)
     {
-        var alert = await _context.Alerts.FindAsync(alertId);
-        if (alert != null)
+        var alert = await _context.Alerts.FirstOrDefaultAsync(a => a.Id == alertId);
+        if (alert == null)
         {
-            _context.Alerts.Remove(alert);
-            await _context.SaveChangesAsync();
+            throw new KeyNotFoundException($"Alert with ID {alertId} was not found.");
         }
+
+        alert.IsDeleted = true;
+        _context.Alerts.Update(alert);
+        await _context.SaveChangesAsync();
     }
 }

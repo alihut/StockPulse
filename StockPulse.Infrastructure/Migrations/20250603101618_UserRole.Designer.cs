@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockPulse.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using StockPulse.Infrastructure.Data;
 namespace StockPulse.Infrastructure.Migrations
 {
     [DbContext(typeof(StockPulseDbContext))]
-    partial class StockPulseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250603101618_UserRole")]
+    partial class UserRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

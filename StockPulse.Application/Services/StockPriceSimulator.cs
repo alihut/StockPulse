@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using StockPulse.Application.DTOs;
 using StockPulse.Application.Interfaces;
 using StockPulse.Application.Settings;
-using StockPulse.Messaging.Events;
 
 namespace StockPulse.Application.Services
 {
@@ -14,20 +13,14 @@ namespace StockPulse.Application.Services
         private readonly List<string> _symbols;
         private readonly Random _random = new();
         private readonly IServiceProvider _serviceProvider;
-        private readonly IEventPublisher _eventPublisher;
-        private readonly IStockPricePublisherService _stockPricePublisherService;
         private readonly ILogger<StockPriceSimulator> _logger;
 
         public StockPriceSimulator(
             IServiceProvider serviceProvider,
             IOptions<StockSettings> stockSettingsOptions,
-            IEventPublisher eventPublisher,
-            IStockPricePublisherService stockPricePublisherService,
             ILogger<StockPriceSimulator> logger)
         {
             _serviceProvider = serviceProvider;
-            _eventPublisher = eventPublisher;
-            _stockPricePublisherService = stockPricePublisherService;
             _logger = logger;
             _symbols = stockSettingsOptions.Value.Symbols;
         }
@@ -38,7 +31,11 @@ namespace StockPulse.Application.Services
             {
                 var recordList = GeneratePriceRecords();
 
-                await _stockPricePublisherService.RecordAndPublishAsync(recordList);
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var stockPricePublisherService = scope.ServiceProvider.GetRequiredService<IStockPricePublisherService>();
+                    await stockPricePublisherService.RecordAndPublishAsync(recordList, stoppingToken);
+                }
 
                 await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);
             }

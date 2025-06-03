@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using StockPulse.Application.DTOs;
 using StockPulse.Application.Interfaces;
-using StockPulse.Domain.Entities;
 using StockPulse.Domain.Enums;
 using StockPulse.IntegrationTests.Helpers;
 

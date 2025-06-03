@@ -26,7 +26,7 @@ namespace StockPulse.API.Controllers
                 return Unauthorized("Invalid credentials");
 
             // Generate and return JWT or cookie-based auth here
-            var token = _jwtTokenGenerator.GenerateToken(user.Id, user.Username);
+            var token = _jwtTokenGenerator.GenerateToken(user.Id, user.Username, user.UserRole);
             return Ok(new { token });
         }
     }
