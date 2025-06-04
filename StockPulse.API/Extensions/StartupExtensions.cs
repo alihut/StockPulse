@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RedLockNet;
+using RedLockNet.SERedis;
+using RedLockNet.SERedis.Configuration;
 using StockPulse.API.Helpers;
 using StockPulse.API.Services;
 using StockPulse.Application.Interfaces;
@@ -157,6 +161,19 @@ namespace StockPulse.API.Extensions
                         Array.Empty<string>()
                     }
                 });
+            });
+        }
+
+        public static void AddRedLockFactory(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddSingleton<IDistributedLockFactory>(_ =>
+            {
+                var redisEndpoints = new List<RedLockEndPoint>
+                {
+                    new DnsEndPoint("redis", 6379) // docker service name + port
+                };
+
+                return RedLockFactory.Create(redisEndpoints);
             });
         }
 

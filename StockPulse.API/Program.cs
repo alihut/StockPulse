@@ -31,6 +31,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMemoryCache();
 
 builder.AddCustomSwagger();
+builder.AddRedLockFactory();
 
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 

@@ -1,28 +1,25 @@
-﻿using RedLockNet;
-using StockPulse.Application.DTOs;
+﻿using StockPulse.Application.DTOs;
 using StockPulse.Application.Interfaces;
 using StockPulse.Domain.Enums;
 
-namespace StockPulse.Application.Services
+namespace StockPulse.IntegrationTests.Stubs
 {
-    public class PriceBatchAlertEvaluator : IPriceBatchAlertEvaluator
+    public class LocklessPriceBatchAlertEvaluator : IPriceBatchAlertEvaluator
     {
         private readonly IAlertRepository _alertRepo;
         private readonly INotificationService _notificationService;
         private readonly ICacheService _cacheService;
-        private readonly IDistributedLockFactory _lockFactory;
 
-        public PriceBatchAlertEvaluator(
+        public LocklessPriceBatchAlertEvaluator(
             IAlertRepository alertRepo,
             INotificationService notificationService,
-            ICacheService cacheService,
-            IDistributedLockFactory lockFactory)
+            ICacheService cacheService)
         {
             _alertRepo = alertRepo;
             _notificationService = notificationService;
             _cacheService = cacheService;
-            _lockFactory = lockFactory;
         }
+
 
         public async Task EvaluateAsync(Guid batchId)
         {
@@ -38,19 +35,11 @@ namespace StockPulse.Application.Services
 
                 foreach (var alert in matchingAlerts)
                 {
-                    // 🔐 Acquire distributed lock per alert
-                    var resource = $"alert-lock:{alert.Id}";
-                    using var redLock = await _lockFactory.CreateLockAsync(resource, TimeSpan.FromSeconds(10));
-
-                    if (!redLock.IsAcquired)
-                    {
-                        // Another instance is processing this alert, skip
-                        continue;
-                    }
+                    // ❌ NO LOCK HERE
 
                     bool shouldTrigger =
-                        (alert.Type == AlertType.Above && priceChange.Price > alert.PriceThreshold) ||
-                        (alert.Type == AlertType.Below && priceChange.Price < alert.PriceThreshold);
+                        alert.Type == AlertType.Above && priceChange.Price > alert.PriceThreshold ||
+                        alert.Type == AlertType.Below && priceChange.Price < alert.PriceThreshold;
 
                     if (shouldTrigger)
                     {
@@ -59,8 +48,8 @@ namespace StockPulse.Application.Services
 
                         await _notificationService.NotifyUserAsync(alert.UserId, new
                         {
-                            Symbol = alert.Symbol,
-                            Price = priceChange.Price,
+                            alert.Symbol,
+                            priceChange.Price,
                             TriggeredAt = DateTime.UtcNow
                         });
                     }
@@ -68,4 +57,5 @@ namespace StockPulse.Application.Services
             }
         }
     }
+
 }
