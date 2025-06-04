@@ -114,7 +114,8 @@ dotnet test StockPulse.IntegrationTests
 - **Scalability**: Pub/sub via RabbitMQ, batch evaluation, per-alert locking to avoid double notifications
 - **Extensibility**: DI-first architecture, modular service layers, open to multi-user/tenant setups
 
-While RabbitMQ and Redis locking may seem like overengineering for a demo, they were deliberately chosen to explore production-level concurrency and scalability patterns.
+> While RabbitMQ and Redis locking may seem like overengineering for a demo, they were intentionally chosen to simulate production-level concurrency and scalability challenges.
+
 ---
 
 ## 🧭 Future Enhancements
