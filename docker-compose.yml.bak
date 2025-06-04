@@ -29,10 +29,6 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
-  redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
 
   ui:
     build:

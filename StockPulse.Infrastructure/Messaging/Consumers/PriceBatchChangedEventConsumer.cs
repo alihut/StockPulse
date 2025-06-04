@@ -6,16 +6,16 @@ namespace StockPulse.Infrastructure.Messaging.Consumers
 {
     public class PriceBatchChangedEventConsumer : IConsumer<PriceBatchChangedEvent>
     {
-        private readonly IAlertEvaluationService _alertEvaluationService;
+        private readonly IPriceBatchAlertEvaluator _priceBatchAlertEvaluator;
 
-        public PriceBatchChangedEventConsumer(IAlertEvaluationService alertEvaluationService)
+        public PriceBatchChangedEventConsumer(IPriceBatchAlertEvaluator priceBatchAlertEvaluator)
         {
-            _alertEvaluationService = alertEvaluationService;
+            _priceBatchAlertEvaluator = priceBatchAlertEvaluator;
         }
 
         public async Task Consume(ConsumeContext<PriceBatchChangedEvent> context)
         {
-            await _alertEvaluationService.EvaluateAlertsAsync(context.Message.Prices);
+            await _priceBatchAlertEvaluator.EvaluateAsync(context.Message.BatchId);
         }
     }
 }

@@ -11,15 +11,18 @@ namespace StockPulse.Application.Services
         private readonly IStockPriceService _stockPriceService;
         private readonly IEventPublisher _eventPublisher;
         private readonly ISymbolValidator _symbolValidator;
+        private readonly ICacheService _cacheService;
 
         public StockPricePublisherService(
             IStockPriceService stockPriceService,
             IEventPublisher eventPublisher,
-            ISymbolValidator symbolValidator)
+            ISymbolValidator symbolValidator,
+            ICacheService cacheService)
         {
             _stockPriceService = stockPriceService;
             _eventPublisher = eventPublisher;
             _symbolValidator = symbolValidator;
+            _cacheService = cacheService;
         }
 
         public async Task<Result> RecordAndPublishAsync(IEnumerable<RecordPriceRequestDto> prices, CancellationToken cancellationToken = default)
@@ -33,13 +36,10 @@ namespace StockPulse.Application.Services
 
             await _stockPriceService.RecordPricesAsync(prices);
 
-            var priceChanges = prices.Select(p => new PriceChangedDto
-            {
-                Symbol = p.Symbol,
-                NewPrice = p.Price
-            }).ToList();
 
-            var evt = new PriceBatchChangedEvent { Prices = priceChanges };
+            var batchId = Guid.NewGuid();
+            _cacheService.Set($"PriceBatch:{batchId}", prices, TimeSpan.FromMinutes(1));
+            var evt = new PriceBatchChangedEvent { BatchId = batchId };
             await _eventPublisher.PublishAsync(evt, cancellationToken);
 
             return Result.Success();

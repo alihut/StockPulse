@@ -70,37 +70,6 @@ namespace StockPulse.API.Extensions
             builder.Services.AddAuthorization();
         }
 
-
-        //public static void AddJwtAuthentication(this WebApplicationBuilder builder)
-        //{
-        //    var jwtSettings = builder.Configuration.GetSettings<JwtSettings>();
-        //    var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
-
-        //    builder.Services.AddAuthentication(options =>
-        //        {
-        //            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        //            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        //        })
-        //        .AddJwtBearer(options =>
-        //        {
-        //            options.RequireHttpsMetadata = false;
-        //            options.SaveToken = true;
-        //            options.TokenValidationParameters = new TokenValidationParameters
-        //            {
-        //                ValidateIssuer = true,
-        //                ValidIssuer = jwtSettings.Issuer,
-        //                ValidateAudience = true,
-        //                ValidAudience = jwtSettings.Audience,
-        //                ValidateIssuerSigningKey = true,
-        //                IssuerSigningKey = new SymmetricSecurityKey(key),
-        //                ValidateLifetime = true
-        //            };
-
-        //        });
-
-        //    builder.Services.AddAuthorization();
-        //}
-
         public static void AddApplicationServices(this WebApplicationBuilder builder)
         {
             builder.Services.AddHttpContextAccessor();
@@ -117,7 +86,7 @@ namespace StockPulse.API.Extensions
             builder.Services.AddScoped<IStockPriceService, StockPriceService>();
             builder.Services.AddScoped<IStockPricePublisherService, StockPricePublisherService>();
             builder.Services.AddScoped<INotificationService, SignalRNotificationService>();
-            builder.Services.AddScoped<IAlertEvaluationService, AlertEvaluationService>();
+            builder.Services.AddScoped<IPriceBatchAlertEvaluator, PriceBatchAlertEvaluator>();
         }
 
         private static void AddStockPriceSimulator(this WebApplicationBuilder builder)

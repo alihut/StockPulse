@@ -1,22 +1,25 @@
-﻿using StockPulse.Application.Interfaces;
+﻿using StockPulse.Application.DTOs;
+using StockPulse.Application.Interfaces;
 using StockPulse.Domain.Enums;
-using StockPulse.Messaging.Events;
 
 namespace StockPulse.Application.Services
 {
-    public class AlertEvaluationService : IAlertEvaluationService
+    public class PriceBatchAlertEvaluator : IPriceBatchAlertEvaluator
     {
         private readonly IAlertRepository _alertRepo;
         private readonly INotificationService _notificationService;
+        private readonly ICacheService _cacheService;
 
-        public AlertEvaluationService(IAlertRepository alertRepo, INotificationService notificationService)
+        public PriceBatchAlertEvaluator(IAlertRepository alertRepo, INotificationService notificationService, ICacheService cacheService)
         {
             _alertRepo = alertRepo;
             _notificationService = notificationService;
+            _cacheService = cacheService;
         }
 
-        public async Task EvaluateAlertsAsync(List<PriceChangedDto> prices)
+        public async Task EvaluateAsync(Guid batchId)
         {
+            var prices = _cacheService.Get<IEnumerable<RecordPriceRequestDto>>($"PriceBatch:{batchId}");
             var symbols = prices.Select(p => p.Symbol).Distinct();
             var alerts = await _alertRepo.GetActiveAlertsBySymbolsAsync(symbols);
 
@@ -27,8 +30,8 @@ namespace StockPulse.Application.Services
                 foreach (var alert in matchingAlerts)
                 {
                     bool shouldTrigger =
-                        (alert.Type == AlertType.Above && priceChange.NewPrice > alert.PriceThreshold) ||
-                        (alert.Type == AlertType.Below && priceChange.NewPrice < alert.PriceThreshold);
+                        (alert.Type == AlertType.Above && priceChange.Price > alert.PriceThreshold) ||
+                        (alert.Type == AlertType.Below && priceChange.Price < alert.PriceThreshold);
 
                     if (shouldTrigger)
                     {
@@ -38,7 +41,7 @@ namespace StockPulse.Application.Services
                         await _notificationService.NotifyUserAsync(alert.UserId, new
                         {
                             Symbol = alert.Symbol,
-                            Price = priceChange.NewPrice,
+                            Price = priceChange.Price,
                             TriggeredAt = DateTime.UtcNow
                         });
                     }
