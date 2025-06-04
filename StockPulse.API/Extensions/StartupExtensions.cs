@@ -1,11 +1,15 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using StockPulse.API.Helpers;
 using StockPulse.API.Services;
 using StockPulse.Application.Interfaces;
 using StockPulse.Application.Services;
 using StockPulse.Application.Settings;
+using StockPulse.Infrastructure.Data;
 using StockPulse.Infrastructure.Repositories;
 using StockPulse.Infrastructure.Services;
 
@@ -137,6 +141,61 @@ namespace StockPulse.API.Extensions
             builder.Services.AddScoped<IAlertRepository, AlertRepository>();
             builder.Services.AddScoped<IStockPriceRepository, StockPriceRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+        }
+
+        public static void AddCustomCors(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy
+                        .WithOrigins("http://localhost:5173", "http://localhost:8080")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+            });
+        }
+
+        public static void AddCustomSwagger(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new() { Title = "StockPulse API", Version = "v1" });
+
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter your JWT token in the format: Bearer {token}"
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer" // This MUST match the AddSecurityDefinition key
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
+        }
+
+        public static async Task ApplyMigrationsAsync(this WebApplication app)
+        {
+            using var scope = app.Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<StockPulseDbContext>();
+            await dbContext.Database.MigrateAsync();
         }
     }
 }

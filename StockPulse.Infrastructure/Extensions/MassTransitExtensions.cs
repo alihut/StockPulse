@@ -18,7 +18,7 @@ namespace StockPulse.Infrastructure.Extensions
 
                 cfg.UsingRabbitMq((context, busCfg) =>
                 {
-                    busCfg.Host("localhost", "/", h =>
+                    busCfg.Host("rabbitmq", "/", h =>
                     {
                         h.Username("guest");
                         h.Password("guest");

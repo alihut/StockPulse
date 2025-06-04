@@ -1,4 +1,5 @@
-    const baseUrl = "https://localhost:7048/api";
+    const baseUrl = "http://localhost:5000";
+    const baseApiUrl = `${baseUrl}/api`;
     let userToken = null;
     let adminToken = null;
     let userConnection = null;
@@ -6,7 +7,7 @@
     async function loginUser() {
       const username = document.getElementById("user-username").value;
       const password = document.getElementById("user-password").value;
-      const res = await fetch(`${baseUrl}/auth/login`, {
+      const res = await fetch(`${baseApiUrl}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
@@ -22,7 +23,7 @@
 
     async function connectToSignalR() {
       userConnection = new signalR.HubConnectionBuilder()
-        .withUrl("https://localhost:7048/alerts", {
+        .withUrl(`${baseUrl}/alerts`, {
           accessTokenFactory: () => userToken
         })
         .configureLogging(signalR.LogLevel.Information)
@@ -43,7 +44,7 @@
       const threshold = parseFloat(document.getElementById("user-threshold").value);
       const alertType = parseInt(document.getElementById("user-alert-type").value);
 
-      const res = await fetch(`${baseUrl}/alert`, {
+      const res = await fetch(`${baseApiUrl}/alert`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,7 +66,7 @@
     }
 
     async function getAlerts() {
-      const res = await fetch(`${baseUrl}/alert`, {
+      const res = await fetch(`${baseApiUrl}/alert`, {
         headers: { "Authorization": `Bearer ${userToken}` }
       });
       const alerts = await res.json();
@@ -75,7 +76,7 @@
     async function loginAdmin() {
       const username = document.getElementById("admin-username").value;
       const password = document.getElementById("admin-password").value;
-      const res = await fetch(`${baseUrl}/auth/login`, {
+      const res = await fetch(`${baseApiUrl}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
@@ -89,7 +90,7 @@
     async function simulatePrice() {
       const symbol = document.getElementById("admin-symbol").value;
       const price = parseFloat(document.getElementById("admin-price").value);
-      const res = await fetch(`${baseUrl}/stockprice`, {
+      const res = await fetch(`${baseApiUrl}/stockprice`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

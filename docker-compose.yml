@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./StockPulse.API/Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+      - rabbitmq
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Database=StockPulse;User Id=sa;Password=123456;TrustServerCertificate=True;
+      - ASPNETCORE_ENVIRONMENT=Development
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - "1433:1433"
+    environment:
+      - SA_PASSWORD=TdKH9NnR^^ni%3iGp
+      - ACCEPT_EULA=Y
+    volumes:
+      - mssql_data:/var/opt/mssql
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  ui:
+    build:
+      context: ./StockPulse.UI
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+volumes:
+  mssql_data:
