@@ -1,10 +1,8 @@
-﻿using StockPulse.IntegrationTests.Base;
+﻿using FluentAssertions;
+using StockPulse.IntegrationTests.Base;
 using StockPulse.IntegrationTests.Fixtures;
-using StockPulse.IntegrationTests.Helpers;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Net;
-using FluentAssertions;
+using System.Net.Http.Json;
 
 namespace StockPulse.IntegrationTests.Tests
 {

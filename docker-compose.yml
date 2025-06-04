@@ -11,7 +11,7 @@ services:
       - db
       - rabbitmq
     environment:
-      - ConnectionStrings__DefaultConnection=Server=db;Database=StockPulse;User Id=sa;Password=TdKH9NnR^^ni%3iGp;TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=Server=db;Database=StockPulse;User Id=sa;Password=TdKH9NnR^^ni%3iGp;TrustServerCertificate=True;Encrypt=False;
       - ASPNETCORE_ENVIRONMENT=Development
 
   db:

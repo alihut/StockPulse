@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StockPulse.Application.DTOs;
 using StockPulse.Application.Interfaces;
-using StockPulse.Infrastructure.Services;
 
 namespace StockPulse.API.Controllers
 {

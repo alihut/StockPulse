@@ -1,5 +1,4 @@
-﻿using StockPulse.Application.DTOs;
-using StockPulse.Domain.Entities;
+﻿using StockPulse.Domain.Entities;
 using StockPulse.Domain.Enums;
 
 namespace StockPulse.Application.Interfaces

@@ -1,7 +1,7 @@
-﻿using StockPulse.Application.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using StockPulse.Application.Interfaces;
 using StockPulse.Domain.Entities;
 using StockPulse.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace StockPulse.Infrastructure.Repositories
 {

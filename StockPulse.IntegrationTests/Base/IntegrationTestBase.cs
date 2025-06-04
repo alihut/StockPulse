@@ -1,10 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using StockPulse.Infrastructure.Data;
+﻿using Microsoft.AspNetCore.SignalR.Client;
 using StockPulse.IntegrationTests.Fixtures;
 using StockPulse.IntegrationTests.Helpers;
 using System.Net.Http.Headers;
-using Microsoft.AspNetCore.SignalR.Client;
 
 namespace StockPulse.IntegrationTests.Base
 {

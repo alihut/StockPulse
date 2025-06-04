@@ -13,8 +13,8 @@ public class AlertService : IAlertService
     private readonly IUserContext _userContext;
 
     public AlertService(
-        IAlertRepository alertRepository, 
-        IMapper mapper, 
+        IAlertRepository alertRepository,
+        IMapper mapper,
         ISymbolValidator symbolValidator,
         IUserContext userContext)
     {
@@ -29,7 +29,7 @@ public class AlertService : IAlertService
         if (!_symbolValidator.IsValid(request.Symbol))
             return Result.Failure<Guid>(StatusCode.BadRequest, "Invalid stock symbol.");
 
-        if(request.PriceThreshold < 0)
+        if (request.PriceThreshold < 0)
             return Result.Failure<Guid>(StatusCode.BadRequest, "Invalid PriceThreshold");
 
         var userId = _userContext.GetUserId();

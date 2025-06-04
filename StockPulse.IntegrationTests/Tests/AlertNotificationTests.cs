@@ -1,14 +1,14 @@
-﻿using System.Net.Http.Json;
-using System.Text.Json;
-using FluentAssertions;
-using StockPulse.IntegrationTests.Fixtures;
-using StockPulse.IntegrationTests.Base;
+﻿using FluentAssertions;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using StockPulse.Application.DTOs;
 using StockPulse.Application.Interfaces;
 using StockPulse.Domain.Enums;
+using StockPulse.IntegrationTests.Base;
+using StockPulse.IntegrationTests.Fixtures;
 using StockPulse.IntegrationTests.Helpers;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace StockPulse.IntegrationTests.Tests
 {
@@ -44,7 +44,7 @@ namespace StockPulse.IntegrationTests.Tests
             {
                 Symbol = symbol,
                 PriceThreshold = threshold,
-                Type = alertType 
+                Type = alertType
             });
 
             registerResponse.EnsureSuccessStatusCode();

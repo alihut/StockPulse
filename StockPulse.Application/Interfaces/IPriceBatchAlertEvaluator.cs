@@ -1,6 +1,4 @@
-﻿using StockPulse.Messaging.Events;
-
-namespace StockPulse.Application.Interfaces
+﻿namespace StockPulse.Application.Interfaces
 {
     public interface IPriceBatchAlertEvaluator
     {

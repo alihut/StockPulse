@@ -1,13 +1,8 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Text;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
 using StockPulse.Application.Settings;
 using StockPulse.Domain.Enums;
 using StockPulse.Infrastructure.Services;
-using Xunit;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace StockPulse.UnitTests
 {

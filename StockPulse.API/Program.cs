@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using StockPulse.API.Extensions;
 using StockPulse.API.Hubs;
 using StockPulse.API.Mappings;
@@ -16,7 +15,7 @@ builder.Services.AddDbContext<StockPulseDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.AddJwtAuthentication();
 
-builder.AddRedis();
+//builder.AddRedis();
 builder.AddApplicationServices();
 builder.AddRepositories();
 builder.Services.AddMassTransitWithRabbitMq(builder.Configuration);

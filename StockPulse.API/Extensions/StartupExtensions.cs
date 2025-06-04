@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -17,10 +14,12 @@ using StockPulse.Application.Settings;
 using StockPulse.Infrastructure.Data;
 using StockPulse.Infrastructure.Repositories;
 using StockPulse.Infrastructure.Services;
+using System.Net;
+using System.Text;
 
 namespace StockPulse.API.Extensions
 {
-    public  static class StartupExtensions
+    public static class StartupExtensions
     {
         public static void AddConfigurationSettings(this WebApplicationBuilder builder)
         {
@@ -84,8 +83,8 @@ namespace StockPulse.API.Extensions
 
             builder.Services.AddSingleton<ISymbolValidator, SymbolValidator>();
             builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
-            //builder.Services.AddSingleton<ICacheService, MemoryCacheService>();
-            builder.Services.AddSingleton<ICacheService, RedisCacheService>();
+            builder.Services.AddSingleton<ICacheService, MemoryCacheService>();
+            //builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAlertService, AlertService>();

@@ -1,6 +1,6 @@
-﻿using StockPulse.Application.Interfaces;
-using AutoMapper;
+﻿using AutoMapper;
 using StockPulse.Application.DTOs;
+using StockPulse.Application.Interfaces;
 using StockPulse.Domain.Entities;
 
 namespace StockPulse.Application.Services
@@ -10,7 +10,7 @@ namespace StockPulse.Application.Services
         private readonly IStockPriceRepository _repository;
         private readonly IMapper _mapper;
 
-        public StockPriceService(IStockPriceRepository repository, 
+        public StockPriceService(IStockPriceRepository repository,
             IMapper mapper)
         {
             _repository = repository;

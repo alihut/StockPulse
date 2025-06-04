@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using MassTransit;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MassTransit;
 using StockPulse.Application.Interfaces;
 using StockPulse.Infrastructure.Services;
 

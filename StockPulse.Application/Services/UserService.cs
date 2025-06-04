@@ -1,6 +1,6 @@
-﻿using StockPulse.Application.Interfaces;
+﻿using StockPulse.Application.Helpers;
+using StockPulse.Application.Interfaces;
 using StockPulse.Domain.Entities;
-using StockPulse.Application.Helpers;
 
 namespace StockPulse.Application.Services
 {

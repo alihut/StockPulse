@@ -1,6 +1,5 @@
 ﻿using StockPulse.Application.DTOs;
 using StockPulse.Application.Models;
-using StockPulse.Domain.Entities;
 
 namespace StockPulse.Application.Interfaces
 {
