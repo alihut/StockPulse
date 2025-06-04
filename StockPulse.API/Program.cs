@@ -16,6 +16,7 @@ builder.Services.AddDbContext<StockPulseDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.AddJwtAuthentication();
 
+builder.AddRedis();
 builder.AddApplicationServices();
 builder.AddRepositories();
 builder.Services.AddMassTransitWithRabbitMq(builder.Configuration);

@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 using RedLockNet;
 using RedLockNet.SERedis;
 using RedLockNet.SERedis.Configuration;
+using StackExchange.Redis;
 using StockPulse.API.Helpers;
 using StockPulse.API.Services;
 using StockPulse.Application.Interfaces;
@@ -83,7 +84,8 @@ namespace StockPulse.API.Extensions
 
             builder.Services.AddSingleton<ISymbolValidator, SymbolValidator>();
             builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
-            builder.Services.AddSingleton<ICacheService, MemoryCacheService>();
+            //builder.Services.AddSingleton<ICacheService, MemoryCacheService>();
+            builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAlertService, AlertService>();
@@ -161,6 +163,15 @@ namespace StockPulse.API.Extensions
                         Array.Empty<string>()
                     }
                 });
+            });
+        }
+
+        public static void AddRedis(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+            {
+                var configuration = builder.Configuration.GetConnectionString("Redis");
+                return ConnectionMultiplexer.Connect(configuration);
             });
         }
 
